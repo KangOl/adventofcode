@@ -2,11 +2,24 @@ import gleam/string
 import gleam/list
 import gleam/set
 import gleam/int
-import gleam/result
 
 pub fn position(lst: List(a), elem: a) -> Result(Int, Nil) {
   list.index_map(lst, fn(i, x) { #(x, i) })
   |> list.key_find(elem)
+}
+
+pub fn to_set(str: String) -> set.Set(String) {
+  str
+  |> string.to_graphemes
+  |> set.from_list
+}
+
+pub fn first(s: set.Set(a)) -> a {
+  assert Ok(f) =
+    s
+    |> set.to_list
+    |> list.first
+  f
 }
 
 pub fn pt_1(input: String) -> Int {
@@ -20,22 +33,14 @@ pub fn pt_1(input: String) -> Int {
 
     let comp1 =
       string.drop_right(rucksack, l2)
-      |> string.to_graphemes
-      |> set.from_list
+      |> to_set
     let comp2 =
       string.drop_left(rucksack, l2)
-      |> string.to_graphemes
-      |> set.from_list
-    let common =
-      set.intersection(comp1, comp2)
-      |> set.to_list
-      |> list.first
-      |> result.unwrap("-")
+      |> to_set
 
-    {
-      position(alphabet, common)
-      |> result.unwrap(0)
-    } + 1
+    let common = first(set.intersection(comp1, comp2))
+    assert Ok(pos) = position(alphabet, common)
+    pos + 1
   }
   |> int.sum
 }
@@ -50,25 +55,12 @@ pub fn pt_2(input: String) -> Int {
   list.map(
     groups,
     fn(group) {
-      let common =
-        list.map(
-          group,
-          fn(rs) {
-            rs
-            |> string.to_graphemes
-            |> set.from_list
-          },
-        )
+      assert Ok(commons) =
+        list.map(group, to_set)
         |> list.reduce(set.intersection)
-        |> result.unwrap(set.new())
-        |> set.to_list
-        |> list.first
-        |> result.unwrap("-")
 
-      {
-        position(alphabet, common)
-        |> result.unwrap(0)
-      } + 1
+      assert Ok(pos) = position(alphabet, first(commons))
+      pos + 1
     },
   )
   |> int.sum
