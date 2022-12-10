@@ -1,9 +1,10 @@
 import gleam/string
 import gleam/int
 import gleam/list
+import gleam/pair
 
 pub fn signal(input: String) -> List(Int) {
-  let #(x, sig) = {
+  {
     use x, inst <- list.map_fold(string.split(input, "\n"), 1)
     case inst {
       "noop" -> #(x, [x])
@@ -13,10 +14,9 @@ pub fn signal(input: String) -> List(Int) {
       }
     }
   }
-
-  sig
+  // |> io.debug
+  |> pair.second
   |> list.flatten
-  |> list.append([x])
 }
 
 pub fn pt_1(input: String) {
